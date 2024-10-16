@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  go-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Go
+      - name: Set up Go
+        uses: actions/setup-go@v5
+
+      # Run gofmt to format the code and check for any diffs
+      - name: Run gofmt
+        run: |
+          gofmt -l -w .
+          git diff --exit-code
+
+      # Run golangci-lint to lint the code
+      - name: Run golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.50.1
+          golangci-lint run
+
+      # Build the project to ensure it compiles
+      - name: Build the project
+        run: go build

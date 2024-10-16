@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Format the code
+echo "Running gofmt..."
+gofmt -w .
+
+# Lint the code
+echo "Running golangci-lint..."
+golangci-lint run --color=always
+if [ $? -ne 0 ]; then
+    echo "Linting failed. Please fix the issues."
+    exit 1
+fi
+
+# Run tests or build the project to ensure it compiles
+echo "Building project..."
+go build
+if [ $? -ne 0 ]; then
+    echo "Build failed. Please fix the issues."
+    exit 1
+fi
+
+echo "Pre-commit checks passed."
